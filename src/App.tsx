@@ -1,11 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import {Slider} from './Slider'
-import { FaAngleLeft , FaAngleRight} from 'react-icons/fa'
 
+// Import Components
+import { Slider } from './components/Slider'
+import { ColourSelector } from './components/ColourSelector'
+import { MenuIcon } from './components/MenuIcon'
 
+// Declare Point type
+type point = {
+  x: number
+  y: number
+  color: string
+}
 
 function App() {
+
+  // Declare points as an array of the point type
+  var points: Array<point>  
 
   // Colour Options + Themes
   const defaultTheme = ['#558cf4']
@@ -25,22 +36,21 @@ function App() {
 
   // Spiral Options
   const [numPoints, setNumPoints] = useState(100);
-  // const [turnFraction, setTurnFraction] = useState((1 + Math.sqrt(5)) / 2);
   const [turnFraction, setTurnFraction] = useState(1);
   const [increaseRate, setIncreaseRate] = useState(3)
   const [power, setPower] = useState(1)
   const [spiralSize, setSpiralSize] = useState(300)
   const [pointSize, setPointSize] = useState(1)
 
+
   // Menu Support for mobile devices
   const [menuActive, setMenuActive] = useState(false)
-
 
   // Create Points
   function getPoints(){
 
     // Create Array with size equal to numPoints
-    const points = Array(numPoints).fill(null).map(( _ , i) => {
+    points = Array(numPoints).fill({}).map(( _ , i) => {
 
       // Calculate point distance and angle
       let dst = Math.pow(i / (numPoints - 1), power)
@@ -71,7 +81,7 @@ function App() {
   }
 
   // Plot Points
-  function plotPoints(points: any){
+  function plotPoints(points: point[]){
 
     // Get Canvas Element
     const canvaseElm = document.getElementById('boids') as HTMLCanvasElement;
@@ -84,7 +94,6 @@ function App() {
     points.forEach((point: any) => {
 
       // Point Color
-      ctx.strokeStyle = themes[colorScheme][Math.floor(Math.random()*themes[colorScheme].length)]
       ctx.strokeStyle = point.color;
 
       // Point Size
@@ -97,7 +106,6 @@ function App() {
 
   }
 
-
   // Render Canvas
   useEffect(() => {
 
@@ -107,14 +115,18 @@ function App() {
 
   }, [screenDimensions, turnFraction, numPoints, colorScheme, power])
   
-  // Set screen dimensions on load
+  // Set screen dimensions on first render
   useEffect(() => {
 
     setScreenDimensions({width: screen.current.offsetWidth, height: screen.current.offsetHeight})
 
+    window.addEventListener('resize', () => {
+      setScreenDimensions({width: screen.current.offsetWidth, height: screen.current.offsetHeight})
+    })
+    
   }, [])
 
-  // Update turnFraction
+  // Increase Turn Fraction every render
   useEffect(() => {
 
       setTurnFraction(turnFraction + (Math.pow(10, increaseRate) * 0.000001))
@@ -131,49 +143,14 @@ function App() {
         <Slider value = {increaseRate} min = {1} max = {4} setState = {setIncreaseRate} title = {'Change Rate'} step = {1}></Slider>
         <Slider value = {numPoints} min = {1} max = {10000} setState = {setNumPoints} title = {'Num Points'} step = {1}></Slider>
 
-         {/* Colour Selector */}
-         <div className="colourTheme">
-            <div className="title">Colour Theme</div>
-            
-            <div className="colours">
-              {colorScheme > 0 ? 
-                <div className="arrow" onClick = {() => {
-                  setColorTheme(colorScheme - 1)
-                }}><FaAngleLeft/></div>
-                : 
-                <div className="arrow" style = {{opacity: 0.3}}><FaAngleLeft/></div>
-                }
-              {
-                themes[colorScheme].map((theme) => {
-                  return(
-                    <div className='colour' style = {{backgroundColor: theme}}></div>
-                  )
-                })
-              }
-              {colorScheme < (themes.length - 1) ? 
-              <div className="arrow" onClick = {() => {
-                setColorTheme(colorScheme + 1)
-              }}><FaAngleRight/></div>
-              : 
-              <div className="arrow" style = {{opacity: 0.3}}><FaAngleRight/></div>
-              }
-            </div>
-
-          </div>
+        <ColourSelector colorScheme={colorScheme} setColorTheme = {setColorTheme} themes = {themes}></ColourSelector>
           
         <Slider value = {Math.round(power * 100) / 100} min = {-1} max = {1} setState = {setPower} title = {'Power'} step = {0.1}></Slider>
         <Slider value = {spiralSize} min = {10} max = {500} setState = {setSpiralSize} title = {'Spiral Size'} step = {1}></Slider>
 
       </div>
 
-      {/* Menu Icon For Mobile Support */}
-      <div className="menuIcon" onClick={() => {setMenuActive(!menuActive)}}>
-        <div className="hamburger" data-active = {menuActive} id="hamburger-6">
-          <span className="line"></span>
-          <span className="line"></span>
-          <span className="line"></span>
-        </div>
-      </div>
+      <MenuIcon menuActive = {menuActive} setMenuActive = {setMenuActive}></MenuIcon>
 
     </div>
     </>
