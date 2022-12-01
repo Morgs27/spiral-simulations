@@ -7,10 +7,11 @@ type SliderProps = {
     max: number
     title: string
     setState: (data: any) => void
+    step: number
 }
 
 
-export function Slider({value, min, max , title, setState } : SliderProps){
+export function Slider({value, min, max , title, setState, step} : SliderProps){
     const styles = {
         track: {
             width: 150,
@@ -34,6 +35,7 @@ export function Slider({value, min, max , title, setState } : SliderProps){
                 <SliderImport
                     styles = {styles}
                     axis = "x"
+                    xstep= {step}
                     xmax = {max}
                     xmin = {min}
                     x={value}
