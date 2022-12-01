@@ -138,6 +138,12 @@ function App() {
     <div className="screen" ref = {screen}>
       <canvas ref = {canvas} width = {screenDimensions.width | 150} height = {screenDimensions.height | 150} id = 'boids'></canvas> 
       
+      <div className="topInfo">
+            <div className="title">Spiral Visualizer</div>
+            <div className="description">Turn Fraction {Math.round(turnFraction * 100) / 100}</div>
+      </div>
+
+
       <div className="sliders" data-show = {menuActive}>
 
         <Slider value = {increaseRate} min = {1} max = {4} setState = {setIncreaseRate} title = {'Change Rate'} step = {1}></Slider>
